@@ -5,7 +5,9 @@ import { BadRequestError } from '../utils/errors';
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const messages = await req.context.models.Message.find();
+  const messages = await req.context.models.Message.find().catch(
+    (error) => next(new BadRequestError(error))
+  );
 
   return res.send(messages);
 });
@@ -13,7 +15,7 @@ router.get('/', async (req, res) => {
 router.get('/:messageId', async (req, res) => {
   const message = await req.context.models.Message.findById(
     req.params.messageId,
-  );
+  ).catch((error) => next(new BadRequestError(error)));
 
   return res.send(message);
 });
@@ -30,7 +32,7 @@ router.post('/', async (req, res, next) => {
 router.delete('/:messageId', async (req, res) => {
   const message = await req.context.models.Message.findById(
     req.params.messageId,
-  );
+  ).catch((error) => next(new BadRequestError(error)));
 
   if (message) {
     await message.deleteOne();
